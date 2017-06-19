@@ -13,10 +13,6 @@
  
 ### Prepare to install
 To install the module, you need to collect all the files in one zip archive:
-* In Windows, use the archiver (7-zip, winrar, etc.)
-* In linux in the console go to the section with the module and execute the command:
-```sh
-zip -r Arsenalpay .
 
 ### Install
 
