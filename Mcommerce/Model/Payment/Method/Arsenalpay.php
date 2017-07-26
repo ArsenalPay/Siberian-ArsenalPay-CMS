@@ -24,7 +24,8 @@ class Mcommerce_Model_Payment_Method_Arsenalpay extends Mcommerce_Model_Payment_
         if( ! $this->_isValid() ){ 
             return false;
         }
-        $url = '/overview/arsenalpay/mobile_widget/index/value_id/'.$value_id;
+//        $url = '/overview/arsenalpay/mobile_widget/index/value_id/'.$value_id;
+        $url = parent::getPath('/arsenalpay/mobile_widget', array('value_id' => $value_id));
         return $url;
     }
 

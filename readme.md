@@ -2,7 +2,7 @@
 *Arsenal Media LLC*  
 
 ## Version
-*4.1.1*  
+*4.1.2*  
 *Has been tested on Siberian 4.x*  
 
 ##### Basic feature list:  

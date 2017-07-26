@@ -2,7 +2,7 @@
     "name": "Arsenalpay",
     "description": "Arsenalpay module for mcommerce payment",
     "type": "module",
-    "version": "4.1.1",
+    "version": "4.1.2",
     "dependencies": {
         "system": {
             "type": "SAE",
