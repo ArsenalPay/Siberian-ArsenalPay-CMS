@@ -22,8 +22,10 @@ class Arsenalpay_Mobile_WidgetController extends Mcommerce_Controller_Mobile_Def
             'widgetSign' => $widget_sign,
             'nonce' => $nonce
         );
-        
-        $this->_sendHtml($html);
+
+	    $this->getSession()->unsetCart();
+
+        $this->_sendJson($html);
         
     }
 }

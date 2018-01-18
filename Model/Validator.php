@@ -31,13 +31,12 @@ class Arsenalpay_Model_Validator extends Core_Model_Default {
     public function validate($request_array = null) {
         $error = false;
         
-        $pay_status = array_key_exists('STATUS' ,$request_array) ? $request_array['STATUS'] : null;
         $this->post_log("Arsenalpay params:");
         foreach ($this->callback_response as $key) {
             if( !array_key_exists( $key, $request_array ) || empty( $request_array[$key] )){
                 $error = $this->add_error("Missing ".$key. " in response");
             }else{
-                $this->post_log("{$key}={$request_array[$key]}&");
+                $this->post_log("{$key}={$request_array[$key]}");
             }
         }
         if($error){
