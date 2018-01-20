@@ -3,7 +3,7 @@
 $init = function($bootstrap) {
 
 	//Перезаписать дизайн
-	Siberian_Cache_Design::overrideCoreDesign("Arsenalpay");
+	//Siberian_Cache_Design::overrideCoreDesign("Arsenalpay");
 
 	$base = Core_Model_Directory::getBasePathTo("/app/local/modules/Arsenalpay/");
 	require_once "{$base}/Mcommerce/Model/Db/Table/Payment/Method/Arsenalpay.php";
