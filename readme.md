@@ -1,4 +1,4 @@
-#ArsenalPay for Siberian CMS
+# ArsenalPay for Siberian CMS
 
 ### О модулях
 
@@ -43,8 +43,3 @@ ArsenalPay – увеличить прибыль просто!
 pay@arsenalpay.ru 
 
 [arsenalpay.ru](https://arsenalpay.ru)
-
-
-
-
-
