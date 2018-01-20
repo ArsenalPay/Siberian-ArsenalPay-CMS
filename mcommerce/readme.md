@@ -1,4 +1,8 @@
-_Arsenalpay v4.2.2 (Tested on Siberian SAE - v4.12.23 module Mcommerce v4.12.20)_
+## Version
+v4.2.2
+ 
+_Has been tested on Siberian SAE/PE - v4.12.23; Mcommerce module v4.12.20_
+
 
 ### О модуле
 
@@ -15,7 +19,6 @@ _Arsenalpay v4.2.2 (Tested on Siberian SAE - v4.12.23 module Mcommerce v4.12.20)
 ---
 ### Подготовка к установке
 
-
 Для установки модуля, необходимо все файлы собрать в один zip архив :
 * В Windows используйте архиватор (7-zip, winrar и т.п.)
 * В linux в консоле перейти в раздел с модулем и выполнить команду:
@@ -23,9 +26,10 @@ _Arsenalpay v4.2.2 (Tested on Siberian SAE - v4.12.23 module Mcommerce v4.12.20)
 ```sh
 zip -r Arsenalpay .
 ```
+
 ---
 ### Обновление модуля Arsenalpay
-Для избежания проблем при обновлении модуля, необходимо:
+Для избежания проблем при обновлении модуля с версии 4.1.\* , необходимо:
 * перед обновлением очистить содержимое папки /app/local/modules/Arsenalpay
 * выполнить действия указанные в пункте **"Установка"**
 * после установки модуля удалить файл /var/cache/design.cache (это кэш, который содержит пути до шаблонов) 
