@@ -1,0 +1,15 @@
+{
+    "name": "ArsenalpayS",
+    "description": "Arsenalpay payment gateway for subscription module",
+    "type": "module",
+    "version": "4.0.7",
+    "dependencies": {
+        "system": {
+            "type": "PE",
+            "version": "4.0.0"
+        },
+        "modules": {
+            "Subscription": "4.9.0"
+        }
+    }
+}
