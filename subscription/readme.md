@@ -47,7 +47,7 @@ zip -r ArsenalpayS .
 * URL колбэка платежа (Callback URL): http(s)://ваш_домен/payment/arsenalpay/callback
 * URL для редиректа со страницы оплаты:  http(s)://ваш_домен/payment/arsenalpay/success
 
-1. Перейти на страницу backoffice и перейти в разде с API ключами: Settings->APIs
+1. Перейти на страницу backoffice и перейти в раздел с API ключами: Settings->APIs
 2. Настроить параметры:
 - Widget ID - Уникальный идентификатор виджета , обязательный;
 - Callback key - Ключ для проверки подписи запросов, обязательный;
