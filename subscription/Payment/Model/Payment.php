@@ -17,6 +17,10 @@ class Payment_Model_Payment extends Core_Model_Default {
         return self::$_types;
     }
 
+    public static function addPaymentType($payment_code, $payment_type) {
+    	self::$_types[$payment_code] = $payment_type;
+    }
+
     public function getAvailableMethods() {
 
         $methods = array();

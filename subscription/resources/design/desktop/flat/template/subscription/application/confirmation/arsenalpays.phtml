@@ -1,0 +1,21 @@
+<!-- arsenalpays empty confirmation -->
+<div id="form_arsenalpays" class="payment-form form-horizontal text-left" style="display:none;">
+    <br />
+    <div class="feature-block-add">
+        <h3 class="title-editor no-border-radius title-feature-indent">
+            <?php echo __('Arsenalpay') ?>
+        </h3>
+    </div>
+    <div class="container-fluid first-row-feature content-feature">
+        <div class="alert alert-info">
+            <?php echo __('After validating, you will be redirected to the Arsenalpay checkout page.') ?>
+        </div>
+    </div>
+    <script type="text/javascript">
+        window.onSubmitForm['arsenalpays'] = {
+            submit: function () {
+                return formPaymentSubmit($('#paymentForm'));
+            }
+        };
+    </script>
+</div>

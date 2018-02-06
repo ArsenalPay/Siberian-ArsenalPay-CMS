@@ -1,7 +1,7 @@
 ## Version
-v4.0.7
+v4.0.8
  
-_Has been tested on Siberian PE - v4.12.23; Subscription module v4.9.0_
+_Has been tested on Siberian PE - v4.13.0; Subscription module v4.9.0_
 
 ### О модуле
 
@@ -87,7 +87,7 @@ public function checkpayments($task) {
 ( https://developers.siberiancms.com/module/core-inheritance/#siberian-core-classes )
 Поэтому, если вы активно правите исходный код модуля Subscription, рекомендуем Вам:
 * Перенести папки Subscription и Payment из данного модуля (/app/local/modules/ArsenalpayS) в дирректорию /app/pe/modules с заменой файлов.
-* Закоментировать строки в bootstrap.php
+* Закоментировать строки в init.php
 ```
 require_once "{$base}/Subscription/controllers/ApplicationController.php"; 
 require_once "{$base}/Subscription/controllers/Backoffice/Application/EditController.php";

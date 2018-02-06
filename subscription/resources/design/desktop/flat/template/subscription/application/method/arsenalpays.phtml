@@ -1,0 +1,16 @@
+<?php
+$paymentCode = $this->getPaymentCode();
+$paymentType = $this->getPaymentType();
+?>
+
+<label for="<?php echo $paymentCode ?>_method"
+       data-method="<?php echo $paymentCode ?>"
+       class="payment-method <?php echo $paymentCode ?>_method">
+    <input type="radio"
+           id="<?php echo $paymentCode ?>_method"
+           name="payment_method"
+           style="display: none;"
+           class="payment_method_radio required color-blue"
+           value="<?php echo $paymentCode ?>" />
+    <?php echo __('<img src="%s" width="160" title="%s" />', $this->getImage('payment/method-' . $paymentCode . '.png'), $paymentType); ?>
+</label>
