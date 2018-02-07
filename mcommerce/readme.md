@@ -26,6 +26,9 @@ _Has been tested on Siberian SAE/PE - v4.12.23; Mcommerce module v4.12.20_
 ```sh
 zip -r Arsenalpay .
 ```
+При скачиваниии ZIP архива с GitHub, файлы модуля помещаются в промежуточную папку,
+поэтому нужно перенести файлы модуля в корень архива!
+Если этого не сделать при установке возникнет ошибка "#19-010: The package you have uploaded is invalid"
 
 ---
 ### Обновление модуля Arsenalpay

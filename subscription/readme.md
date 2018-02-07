@@ -1,5 +1,5 @@
 ## Version
-v4.0.8
+v4.0.9
  
 _Has been tested on Siberian PE - v4.13.0; Subscription module v4.9.0_
 
@@ -28,6 +28,7 @@ zip -r ArsenalpayS .
 ```
 При скачиваниии ZIP архива с GitHub, файлы модуля помещаются в промежуточную папку,
 поэтому нужно перенести файлы модуля в корень архива!
+Если этого не сделать при установке возникнет ошибка "#19-010: The package you have uploaded is invalid"
 
 ---
 ### Установка
@@ -79,22 +80,6 @@ public function checkpayments($task) {
 
         $this->unlock($task->getId());
     }
-```
-
----
-
-2\. Модуль использует наследование классов, для встраивания в Subscription module
-( https://developers.siberiancms.com/module/core-inheritance/#siberian-core-classes )
-Поэтому, если вы активно правите исходный код модуля Subscription, рекомендуем Вам:
-* Перенести папки Subscription и Payment из данного модуля (/app/local/modules/ArsenalpayS) в дирректорию /app/pe/modules с заменой файлов.
-* Закоментировать строки в init.php
-```
-require_once "{$base}/Subscription/controllers/ApplicationController.php"; 
-require_once "{$base}/Subscription/controllers/Backoffice/Application/EditController.php";
-require_once "{$base}/Subscription/Model/Db/Table/Subscription/Application.php"; 
-require_once "{$base}/Payment/Model/Payment.php"; 
-require_once "{$base}/Payment/Model/Arsenalpay.php";
-require_once "{$base}/Payment/controllers/ArsenalpayController.php";
 ```
 
 ------------------
