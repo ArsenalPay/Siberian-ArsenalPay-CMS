@@ -102,7 +102,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 	}
 
 	/**
-	 * @param $_POST |array $callback_params
+	 * @param array $callback_params
 	 */
 	public function processCallback($callback_params) {
 		if (!$this->checkParams($callback_params)) {
@@ -174,8 +174,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			'reverse',
 		);
 
-		$partition_pay = $arsenalpay_order->getStatus() == 'payment' && $callback_params['MERCH_TYPE'] == 1;
-		if (in_array($arsenalpay_order->getStatus(), $rejected_statuses) && !$partition_pay && $arsenalpay_order->getStatus()) {
+		if (in_array($arsenalpay_order->getStatus(), $rejected_statuses) && $arsenalpay_order->getStatus()) {
 			$this->log(
 				'Aborting, Order #' . $callback_params['ACCOUNT'] . ' has rejected status(' . $arsenalpay_order->getStatus() . ')'
 			);
@@ -189,9 +188,62 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			$this->log('Check error: Amounts do not match (request amount ' . $callback_params['AMOUNT'] . ' and ' . $total . ')');
 			$this->exitf("NO");
 		}
+
+		$answer           = "YES";
+		$isFiscalRequired = (isset($callback_params['OFD']) && $callback_params['OFD'] == '1');
+		if ($isFiscalRequired) {
+			$answer = $this->prepareFiscalDocument($order);
+			if (!$answer) {
+				$this->log("Check error: can`t prepare fiscal document");
+				$this->exitf("ERR_FISCAL");
+			}
+		}
+
 		$arsenalpay_order->setData(array('status' => $callback_params['STATUS']));
 		$arsenalpay_order->save();
-		$this->exitf('YES');
+		$this->exitf($answer);
+	}
+
+	/**
+	 * @param Sales_Model_Order $order
+	 *
+	 * @return string
+	 */
+	private function prepareFiscalDocument($order) {
+		$tax_rate = $order->getData("tax_rate");
+
+		$fiscal = array(
+			"id"      => uniqid() . $order->getId(),
+			"type"    => "sell",
+			"receipt" => array(
+				"attributes" => array(
+					"email" => $order->getAdminEmail(),
+					"phone" => $order->getAdminPhone(),
+				),
+				"items"      => array(),
+			)
+		);
+
+		foreach ($order->getLines() as $line) {
+			/**
+			 * @var Sales_Model_Order_Line $line
+			 */
+			$total_excl_tax = $line->getTotalPriceExclTax();
+			$total          = $total_excl_tax * ($tax_rate / 100) + $total_excl_tax;
+
+			$fiscal['receipt']['items'][] = array(
+				"name"     => $line->getName(),
+				"price"    => $total,
+				"quantity" => $line->getQty(),
+				"sum"      => $line->getQty() * $total,
+				"tax"      => "",
+			);
+		}
+
+		$str = json_encode($fiscal);
+
+		return $str;
+
 	}
 
 	/**
@@ -227,8 +279,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			'hold',
 		);
 
-		$partition_pay = $arsenalpay_order->getStatus() == 'payment' && $callback_params['MERCH_TYPE'] == 1;
-		if (!in_array($arsenalpay_order->getStatus(), $required_statuses) && !$partition_pay) {
+		if (!in_array($arsenalpay_order->getStatus(), $required_statuses)) {
 			$this->log('Aborting, Order #' . $callback_params['ACCOUNT'] . ' has rejected status(' . $arsenalpay_order->getStatus() . ')');
 			$this->exitf('ERR');
 		}
@@ -360,9 +411,9 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			}
 			$is_recurrent = $arsenalpay_subscription_id ? 1 : 0;
 			//keys will be saved in subscription_application_detail table
-			$data         = array(
+			$data = array(
 				'payment_data' => array(
-					'is_recurrent'        => $is_recurrent,
+					'is_recurrent'               => $is_recurrent,
 					'arsenalpay_subscription_id' => $arsenalpay_subscription_id,
 				)
 			);
