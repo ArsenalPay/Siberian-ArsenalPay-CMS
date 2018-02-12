@@ -236,7 +236,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 				"price"    => $total,
 				"quantity" => $line->getQty(),
 				"sum"      => $line->getQty() * $total,
-				"tax"      => "",
+//				"tax"      => "",
 			);
 		}
 
