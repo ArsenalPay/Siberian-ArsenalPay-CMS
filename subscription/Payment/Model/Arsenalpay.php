@@ -192,7 +192,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 		$answer           = "YES";
 		$isFiscalRequired = (isset($callback_params['OFD']) && $callback_params['OFD'] == '1');
 		if ($isFiscalRequired) {
-			$answer = $this->prepareFiscalDocument($order);
+			$answer = $this->prepareFiscalDocument($order, $callback_params['RRN']);
 			if (!$answer) {
 				$this->log("Check error: can`t prepare fiscal document");
 				$this->exitf("ERR_FISCAL");
@@ -206,14 +206,15 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 
 	/**
 	 * @param Sales_Model_Order $order
+	 * @param string            $transaction_id
 	 *
 	 * @return string
 	 */
-	private function prepareFiscalDocument($order) {
+	private function prepareFiscalDocument($order, $transaction_id) {
 		$tax_rate = $order->getData("tax_rate");
 
 		$fiscal = array(
-			"id"      => uniqid() . $order->getId(),
+			"id"      => strval($transaction_id),
 			"type"    => "sell",
 			"receipt" => array(
 				"attributes" => array(
