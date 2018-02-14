@@ -105,6 +105,8 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 	 * @param array $callback_params
 	 */
 	public function processCallback($callback_params) {
+		$ip = $_SERVER["REMOTE_ADDR"];
+		$this->log("Income from $ip , POST params:" . print_r($callback_params, 1));
 		if (!$this->checkParams($callback_params)) {
 			$this->exitf('ERR', $callback_params);
 		}
