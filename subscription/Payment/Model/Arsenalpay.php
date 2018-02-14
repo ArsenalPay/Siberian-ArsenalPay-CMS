@@ -244,9 +244,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			);
 		}
 
-		$str = json_encode($fiscal);
-
-		return $str;
+		return $fiscal;
 
 	}
 
