@@ -4,6 +4,12 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 	protected $__widget_url = 'https://arsenalpay.ru/widget.html';
 	protected $__api_url = 'https://arsenalpay.ru/api/';
 	protected $__ap_subscriptions = false;
+	protected $__widget_id ;
+	protected $__widget_key ;
+	protected $__callback_key;
+	protected $__client_id;
+	protected $__client_secret;
+
 
 
 	public function __construct(
@@ -207,14 +213,32 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 		$this->exitf($answer, $callback_params, $ofd);
 	}
 
+
+	private function preparePhone($phone) {
+		$phone = preg_replace('/[^0-9]/','',$phone);
+		if (strlen($phone) < 10) {
+			return false;
+		}
+		if (strlen($phone) == 10) {
+			return $phone;
+		}
+		if (strlen($phone) == 11) {
+			return substr($phone, 1);
+		}
+		return false;
+
+	}
+
 	/**
 	 * @param Sales_Model_Order $order
 	 * @param string            $transaction_id
 	 *
-	 * @return string
+	 * @return array
 	 */
 	private function prepareFiscalDocument($order, $transaction_id) {
 		$tax_rate = $order->getData("tax_rate");
+
+		$phone = $this->preparePhone($order->getAdminPhone());
 
 		$fiscal = array(
 			"id"      => strval($transaction_id),
@@ -222,11 +246,13 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			"receipt" => array(
 				"attributes" => array(
 					"email" => $order->getAdminEmail(),
-					"phone" => $order->getAdminPhone(),
 				),
 				"items"      => array(),
 			)
 		);
+		if($phone) {
+			$fiscal['receipt']['attributes']['phone'] = $phone;
+		}
 
 		foreach ($order->getLines() as $line) {
 			/**
