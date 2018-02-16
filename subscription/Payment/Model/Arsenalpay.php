@@ -131,7 +131,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			}
 			$this->exitf('ERR', $callback_params);
 		}
-		$arsenalpay_order = new Arsenalpays_Model_Order();
+		$arsenalpay_order = new Arsenalpays_Model_Order(); //хранит статус платежа и связан с автоплатежами
 		$arsenalpay_order->find($order->getId(), 'order_id');
 		if (!$arsenalpay_order->getId()) {
 			$arsenalpay_order->setData(array(
@@ -197,7 +197,6 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			$this->exitf("NO", $callback_params);
 		}
 
-		$answer           = "YES";
 		$ofd              = null;
 		$isFiscalRequired = (isset($callback_params['OFD']) && $callback_params['OFD'] == '1');
 		if ($isFiscalRequired) {
@@ -210,7 +209,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 
 		$arsenalpay_order->setData(array('status' => $callback_params['STATUS']));
 		$arsenalpay_order->save();
-		$this->exitf($answer, $callback_params, $ofd);
+		$this->exitf("YES", $callback_params, $ofd);
 	}
 
 
