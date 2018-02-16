@@ -4,6 +4,12 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 	protected $__widget_url = 'https://arsenalpay.ru/widget.html';
 	protected $__api_url = 'https://arsenalpay.ru/api/';
 	protected $__ap_subscriptions = false;
+	protected $__widget_id ;
+	protected $__widget_key ;
+	protected $__callback_key;
+	protected $__client_id;
+	protected $__client_secret;
+
 
 
 	public function __construct(
@@ -102,28 +108,30 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 	}
 
 	/**
-	 * @param $_POST |array $callback_params
+	 * @param array $callback_params
 	 */
 	public function processCallback($callback_params) {
+		$ip = $_SERVER["REMOTE_ADDR"];
+		$this->log("Income from $ip , POST params:" . print_r($callback_params, 1));
 		if (!$this->checkParams($callback_params)) {
-			$this->exitf('ERR');
+			$this->exitf('ERR', $callback_params);
 		}
 		$function = $callback_params['FUNCTION'];
 		$KEY      = $this->__callback_key;
 		if (!($this->checkSign($callback_params, $KEY))) {
 			$this->log('Error: invalid sign');
-			$this->exitf('ERR');
+			$this->exitf('ERR', $callback_params);
 		}
 		$order = new Sales_Model_Order();
 		$order->find($callback_params['ACCOUNT']);
 		if (!$order->getId()) {
 			$this->log('Order #' . $callback_params['ACCOUNT'] . ' not found');
 			if ($function == 'check') {
-				$this->exitf('NO');
+				$this->exitf('NO', $callback_params);
 			}
-			$this->exitf('ERR');
+			$this->exitf('ERR', $callback_params);
 		}
-		$arsenalpay_order = new Arsenalpays_Model_Order();
+		$arsenalpay_order = new Arsenalpays_Model_Order(); //хранит статус платежа и связан с автоплатежами
 		$arsenalpay_order->find($order->getId(), 'order_id');
 		if (!$arsenalpay_order->getId()) {
 			$arsenalpay_order->setData(array(
@@ -156,7 +164,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 
 			default: {
 				$this->log('Not supporting function - ' . $function);
-				$this->exitf('ERR');
+				$this->exitf('ERR', $callback_params);
 			}
 		}
 	}
@@ -174,12 +182,11 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			'reverse',
 		);
 
-		$partition_pay = $arsenalpay_order->getStatus() == 'payment' && $callback_params['MERCH_TYPE'] == 1;
-		if (in_array($arsenalpay_order->getStatus(), $rejected_statuses) && !$partition_pay && $arsenalpay_order->getStatus()) {
+		if (in_array($arsenalpay_order->getStatus(), $rejected_statuses) && $arsenalpay_order->getStatus()) {
 			$this->log(
 				'Aborting, Order #' . $callback_params['ACCOUNT'] . ' has rejected status(' . $arsenalpay_order->getStatus() . ')'
 			);
-			$this->exitf('NO');
+			$this->exitf('NO', $callback_params);
 		}
 		$total           = $order->getTotal();
 		$isCorrectAmount = ($callback_params['MERCH_TYPE'] == 0 && $total == $callback_params['AMOUNT']) ||
@@ -187,11 +194,83 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 
 		if (!$isCorrectAmount) {
 			$this->log('Check error: Amounts do not match (request amount ' . $callback_params['AMOUNT'] . ' and ' . $total . ')');
-			$this->exitf("NO");
+			$this->exitf("NO", $callback_params);
 		}
+
+		$ofd              = null;
+		$isFiscalRequired = (isset($callback_params['OFD']) && $callback_params['OFD'] == '1');
+		if ($isFiscalRequired) {
+			$ofd = $this->prepareFiscalDocument($order, $callback_params['RRN']);
+			if (!$ofd) {
+				$this->log("Check error: can`t prepare fiscal document");
+				$this->exitf("ERR_FISCAL", $callback_params);
+			}
+		}
+
 		$arsenalpay_order->setData(array('status' => $callback_params['STATUS']));
 		$arsenalpay_order->save();
-		$this->exitf('YES');
+		$this->exitf("YES", $callback_params, $ofd);
+	}
+
+
+	private function preparePhone($phone) {
+		$phone = preg_replace('/[^0-9]/','',$phone);
+		if (strlen($phone) < 10) {
+			return false;
+		}
+		if (strlen($phone) == 10) {
+			return $phone;
+		}
+		if (strlen($phone) == 11) {
+			return substr($phone, 1);
+		}
+		return false;
+
+	}
+
+	/**
+	 * @param Sales_Model_Order $order
+	 * @param string            $transaction_id
+	 *
+	 * @return array
+	 */
+	private function prepareFiscalDocument($order, $transaction_id) {
+		$tax_rate = $order->getData("tax_rate");
+
+		$phone = $this->preparePhone($order->getAdminPhone());
+
+		$fiscal = array(
+			"id"      => strval($transaction_id),
+			"type"    => "sell",
+			"receipt" => array(
+				"attributes" => array(
+					"email" => $order->getAdminEmail(),
+				),
+				"items"      => array(),
+			)
+		);
+		if($phone) {
+			$fiscal['receipt']['attributes']['phone'] = $phone;
+		}
+
+		foreach ($order->getLines() as $line) {
+			/**
+			 * @var Sales_Model_Order_Line $line
+			 */
+			$total_excl_tax = $line->getTotalPriceExclTax();
+			$total          = $total_excl_tax * ($tax_rate / 100) + $total_excl_tax;
+
+			$fiscal['receipt']['items'][] = array(
+				"name"     => $line->getName(),
+				"price"    => $total,
+				"quantity" => $line->getQty(),
+				"sum"      => $line->getQty() * $total,
+//				"tax"      => "",
+			);
+		}
+
+		return $fiscal;
+
 	}
 
 	/**
@@ -208,12 +287,12 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 
 		if (in_array($arsenalpay_order->getStatus(), $rejected_statuses)) {
 			$this->log('Aborting, Order #' . $callback_params['ACCOUNT'] . ' has rejected status(' . $arsenalpay_order->getStatus() . ')');
-			$this->exitf('ERR');
+			$this->exitf('ERR', $callback_params);
 		}
 
 		$arsenalpay_order->setData(array('status' => 'cancel'));
 		$arsenalpay_order->save();
-		$this->exitf('OK');
+		$this->exitf('OK', $callback_params);
 	}
 
 	/**
@@ -227,10 +306,9 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			'hold',
 		);
 
-		$partition_pay = $arsenalpay_order->getStatus() == 'payment' && $callback_params['MERCH_TYPE'] == 1;
-		if (!in_array($arsenalpay_order->getStatus(), $required_statuses) && !$partition_pay) {
+		if (!in_array($arsenalpay_order->getStatus(), $required_statuses)) {
 			$this->log('Aborting, Order #' . $callback_params['ACCOUNT'] . ' has rejected status(' . $arsenalpay_order->getStatus() . ')');
-			$this->exitf('ERR');
+			$this->exitf('ERR', $callback_params);
 		}
 		$total           = $order->getTotal();
 		$isCorrectAmount = ($callback_params['MERCH_TYPE'] == 0 && $total == $callback_params['AMOUNT']) ||
@@ -238,7 +316,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 
 		if (!$isCorrectAmount) {
 			$this->log('Payment error: Amounts do not match (request amount ' . $callback_params['AMOUNT'] . ' and ' . $total . ')');
-			$this->exitf("ERR");
+			$this->exitf("ERR", $callback_params);
 		}
 		$arsenalpay_order->setData(
 			array(
@@ -246,7 +324,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			)
 		);
 		$arsenalpay_order->save();
-		$this->exitf('OK');
+		$this->exitf('OK', $callback_params);
 	}
 
 	private function callbackHold($callback_params, $order, $arsenalpay_order) {
@@ -256,7 +334,7 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 		);
 		if (!in_array($arsenalpay_order->getStatus(), $required_statuses)) {
 			$this->log('Aborting, Order #' . $callback_params['ACCOUNT'] . ' has not been checked. Order has status (' . $arsenalpay_order->getStatus() . ')');
-			$this->exitf('ERR');
+			$this->exitf('ERR', $callback_params);
 		}
 		$total           = $order->getTotal();
 		$isCorrectAmount = ($callback_params['MERCH_TYPE'] == 0 && $total == $callback_params['AMOUNT']) ||
@@ -264,11 +342,11 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 
 		if (!$isCorrectAmount) {
 			$this->log('Hold error: Amounts do not match (request amount ' . $callback_params['AMOUNT'] . ' and ' . $total . ')');
-			$this->exitf("ERR");
+			$this->exitf("ERR", $callback_params);
 		}
 		$arsenalpay_order->setData(array('status' => $callback_params['STATUS']));
 		$arsenalpay_order->save();
-		$this->exitf('OK');
+		$this->exitf('OK', $callback_params);
 	}
 
 
@@ -328,9 +406,23 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 		$this->logger->log($msg, Zend_Log::DEBUG);
 	}
 
-	private function exitf($msg) {
-		$this->log($msg);
-		echo $msg;
+	private function exitf($response, $callback_params, $ofd = null) {
+		if (isset($callback_params['FORMAT']) && $callback_params['FORMAT'] == 'json') {
+			if (isset($ofd) && $ofd != null) {
+				$response = json_encode(array(
+					"response" => $response,
+					"ofd"      => $ofd
+				));
+			}
+			else {
+				$response = json_encode(array(
+					"response" => $response
+				));
+			}
+
+		}
+		$this->log($response);
+		echo $response;
 		die();
 	}
 
@@ -360,9 +452,9 @@ class Payment_Model_Arsenalpay extends Payment_Model_Abstract {
 			}
 			$is_recurrent = $arsenalpay_subscription_id ? 1 : 0;
 			//keys will be saved in subscription_application_detail table
-			$data         = array(
+			$data = array(
 				'payment_data' => array(
-					'is_recurrent'        => $is_recurrent,
+					'is_recurrent'               => $is_recurrent,
 					'arsenalpay_subscription_id' => $arsenalpay_subscription_id,
 				)
 			);
