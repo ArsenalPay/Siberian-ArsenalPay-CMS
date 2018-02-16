@@ -1,4 +1,8 @@
 # ArsenalPay for Siberian CMS
+Pack **v1.0** with
+* Arsenalpay Mcommerce **v4.2.3** (_Has been tested on Siberian SAE/PE - v4.13.0; Mcommerce module v4.12.20_)
+* Arsenalpay Subscription **v4.0.9** (_Has been tested on Siberian PE - v4.13.0; Subscription module v4.9.0_)
+
 
 ### О модулях
 
@@ -6,14 +10,17 @@
 * **mcommerce/** - Встраивается в модуль [Mcommerce](https://doc.siberiancms.com/knowledge-base/mcommerce/) .
 После установки в настройках магазина появится новый вариант оплаты через платежную систему "Arsenalpay".
 * **subscription/** - Встраивается в модуль Subscription (модуль  входит в состав издания 
-[PE](https://www.siberiancms.com/app-builder-platform-edition/) ). Позволяет клиентам оплатчивать подписку на приложение при помощи "Arsenalpay". 
-
-Модули устанавливаются независимо, в каждом модуле содержится Readme.md с подробной инструкцией
-по установке.
+[PE](https://www.siberiancms.com/app-builder-platform-edition/) ). Позволяет клиентам оплатчивать публикации приложений при помощи "Arsenalpay". 
 
 Платежная система "ArsenalPay" позволяет совершать оплату с различных источников списания средств: мобильных номеров
 (МТС/Мегафон/Билайн/TELE2), пластиковых карт (VISA/MasterCard/Maestro/Мир). Перечень доступных источников средств постоянно
 пополняется. Следите за обновлениями.
+
+---
+### Установка
+Модули устанавливаются независимо, в каждом модуле содержится Readme.md с подробной инструкцией
+по установке.
+
 
 ---
 ### Преимущества сервиса: 
