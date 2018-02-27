@@ -270,7 +270,7 @@
                     <input type="text" id="arsenalpay_secret" class="input-flat required" name="details_payment_methods[<?php echo $method->getMethod()->getMethodId(); ?>][secret]" value="<?php echo $method->getSecret(); ?>" placeholder="<?php echo $this->_("Callback key"); ?>" />
                 </div>
             </div>
-            
+
             <div class="form-group arsenalpay_data"<?php if (!$method->getId()) : ?>style="display:none;"<?php endif; ?>>
                 <div class="col-sm-4">
                     <label for="arsenalpay_widget_key"><?php echo $this->_("Widget Key:"); ?> <span>*</span></label>
@@ -280,6 +280,27 @@
                 </div>
             </div>
 
+            <div class="form-group arsenalpay_data"<?php if (!$method->getId()) : ?>style="display:none;"<?php endif; ?>>
+                <div class="col-sm-4">
+                    <label for="arselpay_open_widget_in_browser">
+                         <?php echo __('Displaying widget'); ?>
+                    </label>
+                </div>
+                <div class="col-sm-5">
+                        <select id="arsenalpay_open_widget_in_browser"
+                                class="input-flat"
+                                name="details_payment_methods[<?php echo $this->getMethodId(); ?>][open_widget_in_browser]" >
+                        <option value="0"
+                                <?php echo (boolean) $methodInstance->getOpenWidgetInBrowser() === true ? '' : 'selected'; ?> >
+                            <?php echo __('Open in app');?>
+                        </option>
+                        <option value="1"
+                                <?php echo (boolean) $methodInstance->getOpenWidgetInBrowser() === true ? 'selected' : ''; ?> >
+                            <?php echo __('Open in browser');?>
+                        </option>
+                    </select>
+                </div>
+            </div>
 
             <div class="form-group arsenalpay_data"<?php if(!$method->getId()) : ?>style="display:none;"<?php endif; ?>>
                 <div class="col-sm-4">

@@ -1,5 +1,5 @@
 ## Version
-v4.2.3
+v4.2.4
  
 _Has been tested on Siberian SAE/PE - v4.13.0; Mcommerce module v4.12.20_
 
@@ -49,6 +49,7 @@ _Has been tested on Siberian SAE/PE - v4.13.0; Mcommerce module v4.12.20_
 - Widget ID - Уникальный идентификатор виджета , обязательный;
 - Callback key - Ключ для проверки подписи запросов, обязательный;
 - Widget Key - Ключ для проверки виджета, обязательный;
+- Displaying Widget - Способ отображения платежного виджета: открывать виджет в браузере или внутри приложения.
 - Callback URL - УРЛ колбэка платежа
 
 ---

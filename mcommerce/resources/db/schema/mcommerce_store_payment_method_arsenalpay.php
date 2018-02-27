@@ -42,6 +42,10 @@ $schemas['mcommerce_store_payment_method_arsenalpay'] = array(
         'charset' => 'utf8',
         'collation' => 'utf8_unicode_ci',
     ),
+    'open_widget_in_browser' => array(
+	    'type'    => 'tinyint(1)',
+	    'default' => '0',
+    ),
     'created_at' => array(
         'type' => 'datetime',
     ),

@@ -46,6 +46,27 @@ $methodInstance = $method->getInstance();
                placeholder="<?php echo __('Callback Key'); ?>" />
     </div>
 </div>
+<div class="form-group arsenalpay_data">
+    <div class="col-sm-3">
+        <label for="arselpay_open_widget_in_browser">
+            <?php echo __('Displaying widget'); ?>
+        </label>
+    </div>
+    <div class="col-sm-5">
+        <select id="arsenalpay_open_widget_in_browser"
+                class="input-flat"
+                name="details_payment_methods[<?php echo $this->getMethodId(); ?>][open_widget_in_browser]" >
+            <option value="0"
+                    <?php echo (boolean) $methodInstance->getOpenWidgetInBrowser() === true ? '' : 'selected'; ?> >
+                <?php echo __('Open in app');?>
+            </option>
+            <option value="1"
+            <?php echo (boolean) $methodInstance->getOpenWidgetInBrowser() === true ? 'selected' : ''; ?> >
+                <?php echo __('Open in browser');?>
+            </option>
+        </select>
+    </div>
+</div>
 
 <div class="form-group arsenalpay_data">
 <div class="col-sm-3">
