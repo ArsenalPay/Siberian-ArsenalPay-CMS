@@ -1,6 +1,6 @@
 # ArsenalPay for Siberian CMS
-Pack **v1.0** with
-* Arsenalpay Mcommerce **v4.2.3** (_Has been tested on Siberian SAE/PE - v4.13.0; Mcommerce module v4.12.20_)
+Pack **v1.1** with
+* Arsenalpay Mcommerce **v4.2.4** (_Has been tested on Siberian SAE/PE - v4.13.0; Mcommerce module v4.12.20_)
 * Arsenalpay Subscription **v4.0.9** (_Has been tested on Siberian PE - v4.13.0; Subscription module v4.9.0_)
 
 
