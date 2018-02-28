@@ -13,5 +13,7 @@ App.factory('ArsenalpayFactory', function($sbhttp, Url) {
             responseType:'json'
         });
     };
+    factory.findtotal = factory.getWidgetData;
+
     return factory;
 });

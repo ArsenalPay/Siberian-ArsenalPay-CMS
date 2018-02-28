@@ -62,9 +62,10 @@ App.config(function ($stateProvider, HomepageLayoutProvider) {
             $ionicLoading.hide();
             goHome();
         } else if ($data.openWidgetInBrowser) {
-            $window.open($data.url);
+            $window.open($data.url, "_system");
             $scope.is_loading = false;
             $ionicLoading.hide();
+            goHome();
         } else {
             $scope.showWidget()
         }
