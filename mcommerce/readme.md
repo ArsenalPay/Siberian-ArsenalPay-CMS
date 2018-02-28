@@ -1,5 +1,5 @@
 ## Version
-v4.2.4
+v4.2.5
  
 _Has been tested on Siberian SAE/PE - v4.13.0; Mcommerce module v4.12.20_
 

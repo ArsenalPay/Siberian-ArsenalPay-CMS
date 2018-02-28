@@ -3,7 +3,7 @@ App.factory('ArsenalpayFactory', function($sbhttp, Url) {
 
     var factory = {};
     factory.value_id = null;
-    factory.findtotal = function() {
+    factory.getWidgetData = function() {
         if(!this.value_id) return false;
         
         return $sbhttp({

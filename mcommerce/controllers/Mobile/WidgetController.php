@@ -2,30 +2,36 @@
 
 class Arsenalpay_Mobile_WidgetController extends Mcommerce_Controller_Mobile_Default {
 
-    public function getoptionsAction(){
-        $cart = $this->getCart();
-        $total = round($cart->getTotal(), 2);
-        
-        $payment = $this->getCart()->getPaymentMethod()->getInstance();
-        $destination = $cart->getId();
-        $customer_id = $cart->getCustomerId();
-        $widget_id = $payment->getWidgetId();
-        $widget_key = $payment->getWidgetKey();
-        $nonce = md5(microtime(true) . mt_rand(100000, 999999));
-        $sign_data = "$customer_id;$destination;$total;$widget_id;$nonce";
-        $widget_sign = hash_hmac('sha256', $sign_data, $widget_key);
-        $html = array(
-            'total' => $total ,
-            'destination' => $destination,
-            'widget_id' => $widget_id,
-            'userId' => $customer_id,
-            'widgetSign' => $widget_sign,
-            'nonce' => $nonce
-        );
+	public function getoptionsAction() {
+		$cart   = $this->getCart();
+		$amount = round($cart->getTotal(), 2);
 
-	    $this->getSession()->unsetCart();
+		$payment                     = $this->getCart()->getPaymentMethod()->getInstance();
+		$destination                 = $cart->getId();
+		$customer_id                 = $cart->getCustomerId();
+		$widget                      = $payment->getWidgetId();
+		$widget_key                  = $payment->getWidgetKey();
+		$nonce                       = md5(microtime(true) . mt_rand(100000, 999999));
+		$sign_data                   = "$customer_id;$destination;$amount;$widget;$nonce";
+		$widget_sign                 = hash_hmac('sha256', $sign_data, $widget_key);
+		$open_widget_in_browser      = $payment->getOpenWidgetInBrowser() ? 1 : 0;
+		$html                        = array(
+			'amount'      => $amount,
+			'destination' => $destination,
+			'widget'      => $widget,
+			'userId'      => $customer_id,
+			'widgetSign'  => $widget_sign,
+			'nonce'       => $nonce,
+		);
+		$request_params              = http_build_query($html);
+		$arsenalpay_url              = "https://arsenalpay.ru/widget.html?" . $request_params;
 
-        $this->_sendJson($html);
-        
-    }
+		$html['openWidgetInBrowser'] = $open_widget_in_browser;
+		$html['url']                 = $arsenalpay_url;
+
+		$this->getSession()->unsetCart();
+
+		$this->_sendJson($html);
+
+	}
 }
