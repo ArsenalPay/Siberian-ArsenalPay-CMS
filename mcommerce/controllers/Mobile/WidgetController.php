@@ -33,6 +33,21 @@ class Arsenalpay_Mobile_WidgetController extends Mcommerce_Controller_Mobile_Def
 		$html['total']     = $amount;
 		$html['widget_id'] = $widget;
 
+		try {
+			$payment_session = new Arsenalpay_Model_PaymentSession();
+			$payment_session->find($destination, 'cart_id');
+			if (!$payment_session->getCartId()) {
+				$payment_session->setCartId($destination);
+			}
+			$customer_uuid = $this->getRequest()->getParam('customer_uuid', null);
+			$payment_session->setData('customer_uuid', $customer_uuid);
+			$payment_session->save();
+		}
+		catch (Exception $e) {
+			$logger = Zend_Registry::get("logger");
+			$logger->log("Arsenalpay widget: Error during save payment session: " . $e->getMessage(), Zend_Log::DEBUG);
+		}
+
 		$this->getSession()->unsetCart();
 
 		$this->_sendJson($html);

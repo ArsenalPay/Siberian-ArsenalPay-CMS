@@ -1,6 +1,6 @@
 <?php
 
-class Arsenalpay_CallbackController extends Mcommerce_Controller_Mobile_Default{
+class Arsenalpay_CallbackController extends Mcommerce_Controller_Mobile_Default {
 	public function init() {
 		$this->_current_option_value = new Application_Model_Option_Value();
 		$this->_current_option_value->setIsHomepage(true);
@@ -9,7 +9,7 @@ class Arsenalpay_CallbackController extends Mcommerce_Controller_Mobile_Default{
 	}
 
 	public function paymentAction() {
-		$post_data      = $this->getRequest()->getPost();
+		$post_data = $this->getRequest()->getPost();
 		ob_start();
 		$validator      = new Arsenalpay_Model_Validator();
 		$isValid        = $validator->validate($post_data);
@@ -25,6 +25,14 @@ class Arsenalpay_CallbackController extends Mcommerce_Controller_Mobile_Default{
 				$cart = new Mcommerce_Model_Cart();
 				$cart->find($post_data['ACCOUNT']);
 				$this->_cart = $cart; //to get Promo
+				try {
+					$payment_session = new Arsenalpay_Model_PaymentSession();
+					$payment_session->find($post_data['ACCOUNT'], 'cart_id');
+					$cart->setCustomerUUID($payment_session->getCustomerUuid());
+				}
+				catch (Exception $e) {
+					$this->post_log('Error during get PaymentSession: ' . $e->getMessage());
+				}
 
 				$value_id = $cart->getMcommerce()->getValueId();
 				$this->getCurrentOptionValue()->find($value_id); //to correct work
@@ -54,10 +62,16 @@ class Arsenalpay_CallbackController extends Mcommerce_Controller_Mobile_Default{
 					$order
 						->fromCart($cart)
 						->setStatusId(Mcommerce_Model_Order::PAID_STATUS);
+
 					$order->save();
 					$order->setHidePaidAmount(true);
 					try {
 						$order->sendToCustomer();
+					}
+					catch (Exception $e) {
+						$this->post_log("Error in send message: " . $e->getMessage());
+					}
+					try {
 						$order->sendToStore();
 					}
 					catch (Exception $e) {
@@ -66,7 +80,8 @@ class Arsenalpay_CallbackController extends Mcommerce_Controller_Mobile_Default{
 
 					$answer = 'OK';
 				}
-			} else if ($function == 'cancel' || $function == 'cancelinit') {
+			}
+			else if ($function == 'cancel' || $function == 'cancelinit') {
 				$cart = new Mcommerce_Model_Cart();
 				$cart->find($post_data['ACCOUNT']);
 				$this->_cart = $cart;
@@ -112,7 +127,7 @@ class Arsenalpay_CallbackController extends Mcommerce_Controller_Mobile_Default{
 
 	private function post_log($str) {
 		$logger = Zend_Registry::get("logger");
-		$logger->log($str, Zend_Log::DEBUG);
+		$logger->log("Arsenalpay callback: " . $str, Zend_Log::DEBUG);
 
 		return $str;
 	}
