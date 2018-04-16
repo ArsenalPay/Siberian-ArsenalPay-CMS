@@ -41,6 +41,14 @@ class Arsenalpay_Mobile_WidgetController extends Mcommerce_Controller_Mobile_Def
 			}
 			$customer_uuid = $this->getRequest()->getParam('customer_uuid', null);
 			$payment_session->setData('customer_uuid', $customer_uuid);
+
+			if ($post_params = $this->getRequest()->getRawBody()) {
+				$post_params = Siberian_Json::decode($post_params);
+				if (isset($post_params['notes'])) {
+					$payment_session->setData('notes', $post_params['notes']);
+				}
+			}
+
 			$payment_session->save();
 		}
 		catch (Exception $e) {

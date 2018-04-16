@@ -25,10 +25,12 @@ class Arsenalpay_CallbackController extends Mcommerce_Controller_Mobile_Default 
 				$cart = new Mcommerce_Model_Cart();
 				$cart->find($post_data['ACCOUNT']);
 				$this->_cart = $cart; //to get Promo
+				$notes = '';
 				try {
 					$payment_session = new Arsenalpay_Model_PaymentSession();
 					$payment_session->find($post_data['ACCOUNT'], 'cart_id');
 					$cart->setCustomerUUID($payment_session->getCustomerUuid());
+					$notes = $payment_session->getNotes();
 				}
 				catch (Exception $e) {
 					$this->post_log('Error during get PaymentSession: ' . $e->getMessage());
@@ -62,6 +64,8 @@ class Arsenalpay_CallbackController extends Mcommerce_Controller_Mobile_Default 
 					$order
 						->fromCart($cart)
 						->setStatusId(Mcommerce_Model_Order::PAID_STATUS);
+
+					$order->setNotes($notes);
 
 					$order->save();
 					$order->setHidePaidAmount(true);

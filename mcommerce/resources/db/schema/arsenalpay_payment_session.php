@@ -33,4 +33,10 @@ $schemas['arsenalpay_payment_session'] = array(
 		'collation' => 'utf8_unicode_ci',
 		'is_null'   => true,
 	),
+	'notes' => array(
+		'type'      => 'varchar(255)',
+		'charset'   => 'utf8',
+		'collation' => 'utf8_unicode_ci',
+		'is_null'   => true,
+	),
 );
