@@ -6,10 +6,10 @@
     "dependencies": {
         "system": {
             "type": "PE",
-            "version": "4.13.0"
+            "version": "4.15.3"
         },
         "modules": {
-            "Subscription": "4.9.0"
+            "Subscription": "4.15.3"
         }
     }
 }
