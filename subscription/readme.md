@@ -1,7 +1,7 @@
 ## Version
-v4.0.9
+v4.1.5
  
-_Has been tested on Siberian PE - v4.13.0; Subscription module v4.9.0_
+_Has been tested on Siberian PE - v4.15.3; Subscription module v4.15.3_
 
 ### О модуле
 
